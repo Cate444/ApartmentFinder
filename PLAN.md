@@ -69,7 +69,7 @@ Avoid: Zillow and Apartments.com (strong anti-scraping measures).
 - **Next.js (JavaScript)**: the website and backend in one project
 - **PostgreSQL on Supabase (free tier)**: SQL database, with built-in login for later
 - **Playwright**: scraping
-- **Claude API (small, cheap model)**: extraction, pros/cons, cost estimates. Budget under $10.
+- **OpenAI API (small, cheap model)**: extraction, pros/cons, cost estimates. Budget under $10.
 - **Commute times**: a mapping API with a free tier, called only for listings that pass the filters, with results cached in the database
 - Runs locally for now; deploy to Vercel at the end
 
