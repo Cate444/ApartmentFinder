@@ -117,3 +117,20 @@ price-drop alerts.
 - Our own GitHub repo (the class `final_projects` repo is just a showcase list of links)
 - `FINAL_REPORT.md` in the repo
 - Add our repo link to the class list
+
+## Progress
+
+| Milestone | Status |
+|---|---|
+| 1. Repo, Next.js scaffold, Supabase, schema + seed user | ✅ Done 11/16/2026 |
+| 2. Search criteria form | ⏭ Next |
+
+### How to run
+- `npm run dev`, then open http://localhost:3000 (the home page shows database status)
+- `npm run db:check` verifies env vars, tables, seed data, and row level security
+- Schema changes: add `supabase/migrations/00N_*.sql` and run it in Supabase's SQL Editor
+
+### Notes for Milestone 2
+- Need the Lehi commute destination (an intersection or landmark is fine) and the BYU campus address.
+- Next.js 16 with `cacheComponents: true`: pages that read the database must `await connection()` inside a `<Suspense>` boundary.
+- All database access goes through `lib/supabase.js` (server only, secret key). Use Server Actions for form writes.
