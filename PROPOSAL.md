@@ -4,23 +4,23 @@ CS 452 Final Project · Full plan in [PLAN.md](PLAN.md) · Hours in [PROJECT_LOG
 
 ## Purpose
 
-**Find a place to live for 3–6 months and see what the whole stay will really cost.**
+**Help anyone who needs housing for a few months (an internship, a travel-nurse contract, a move between cities) find a place and see what the whole stay will really cost.**
 
 Finding housing for a short stay is hard:
 
-- Listings are spread across Facebook Marketplace, KSL, Craigslist, and many apartment complex websites.
+- Listings are spread across Facebook Marketplace, Craigslist, local classifieds, and many apartment complex websites.
 - Complexes rarely post short-term prices. When you ask, they say one of three things:
   **"+$X per month"**, **"$Y flat fee"**, or **"we don't do short leases."**
 - So you can't compare listings by what matters: the **total cost of the stay**.
 
-ApartmentFinder collects listings into one SQL database, filters them against my criteria, and
+ApartmentFinder collects listings into one SQL database, filters them against the user's criteria, and
 shows a feed where each listing has a total cost, commute times, and an AI summary of pros and cons.
 
 ```mermaid
 flowchart LR
-    A["Listings from<br/>KSL, Craigslist,<br/>complex sites,<br/>pasted FB posts"] --> B["AI pulls out<br/>rent, fees,<br/>lease terms"]
+    A["Listings from<br/>classifieds,<br/>complex sites,<br/>pasted FB posts"] --> B["AI pulls out<br/>rent, fees,<br/>lease terms"]
     B --> C[("One SQL<br/>database")]
-    C --> D["Filter + score<br/>against my<br/>criteria"]
+    C --> D["Filter + score<br/>against your<br/>criteria"]
     D --> E["Feed: total cost,<br/>commutes,<br/>pros & cons"]
 ```
 
@@ -29,14 +29,16 @@ flowchart LR
 1. **Total cost for the actual stay**: rent × months + short-term premium + one-time fees, with
    "+ ~$X est." for costs the listing doesn't mention (utilities, parking).
 2. **Record a quote**: after calling a complex, enter what they said ("+$150/mo"), and the total
-   updates. This also tracks which places I've contacted.
-3. **Balanced commute**: rank by the *longer* of two commutes (Lehi and BYU campus), so neither
-   person ends up with a long drive.
-4. **Several sources in one place**: scrapers for KSL, Craigslist, and one apartment platform,
-   plus paste-a-listing for Facebook (no Facebook scraping).
+   updates. This also tracks which places you've contacted.
+3. **Commute-aware**: add any number of places you need to get to (work, school). For households
+   with more than one commuter, rank by the *longest* commute so no one ends up with a long drive.
+4. **Several sources in one place**: scrapers for classified sites and common apartment platforms
+   (RentCafe, Entrata), plus paste-a-listing for Facebook (no Facebook scraping).
 5. **Stay in budget**: about 30 hours of work, under $10 of AI API costs.
 
-**Phase 1** covers Utah County only. Dallas comes later if there's time. Every table has a `user_id`, so other users can be added later without changing the schema.
+Each search is its own city, dates, and criteria, so the same app works anywhere. The first version is
+tested in one metro area with scrapers for its local sites, and adding a region means adding
+sources, not changing the schema. Every table has a `user_id`, so it can support many users.
 
 ## Initial ERD
 
@@ -142,7 +144,7 @@ The full SQL is in [supabase/migrations/001_schema.sql](supabase/migrations/001_
 
 ```mermaid
 flowchart LR
-    U(["Me, in a<br/>web browser"])
+    U(["User, in a<br/>web browser"])
 
     subgraph App["Next.js app (local, then Vercel)"]
         UI["Pages:<br/>search form, feed,<br/>paste listing"]
@@ -153,7 +155,7 @@ flowchart LR
     DB[("Supabase<br/>PostgreSQL")]
     AI["OpenAI API<br/>(small model)"]
     MAP["Mapping API<br/>(commute times)"]
-    WEB["KSL · Craigslist ·<br/>complex websites"]
+    WEB["Classifieds ·<br/>complex websites"]
 
     U -->|"criteria, pasted<br/>listings, quotes"| UI
     UI --> SA
@@ -183,7 +185,7 @@ Done so far (11/16): plan, repo, Next.js app, 10-table schema in Supabase, seed 
 | Date | Goal | Milestone | Est. hrs |
 |---|---|---|---|
 | Tue 11/17 | Search criteria form: dates, price, beds/baths, cities | 2 | 1.5 |
-| Wed 11/18 | Must-haves / nice-to-haves + Lehi & BYU destinations; save to DB | 2 | 1.5 |
+| Wed 11/18 | Must-haves / nice-to-haves + commute destinations; save to DB | 2 | 1.5 |
 | Thu 11/19 | Paste-a-listing page (URL or text) | 3 | 1.5 |
 | Fri 11/20 | AI extraction → listing row (rent, fees, lease terms, amenities) | 3 | 2 |
 | Sat 11/21 | Test extraction on 10 real listings; fix bad fields | 3 | 1.5 |
@@ -194,16 +196,16 @@ Done so far (11/16): plan, repo, Next.js app, 10-table schema in Supabase, seed 
 | Sat 11/28 | Feed page: listing cards with cost breakdown | 5 | 2 |
 | Mon 11/30 | Filters, scoring by nice-to-haves, saved/contacted/rejected status | 5 | 2 |
 | Tue 12/1 | AI pros/cons + "+ ~$X est." undisclosed costs | 6 | 2 |
-| Wed 12/2 | Craigslist (Provo/Orem) scraper | 7 | 1.5 |
-| Thu 12/3 | KSL rentals scraper | 7 | 1.5 |
+| Wed 12/2 | Craigslist scraper | 7 | 1.5 |
+| Thu 12/3 | Local classifieds scraper | 7 | 1.5 |
 | Fri 12/4 | One apartment-platform scraper (RentCafe or Entrata) | 7 | 1.5 |
-| Sat 12/5 | Commute times (cached) + balanced-commute ranking | 8 | 1.5 |
+| Sat 12/5 | Commute times (cached) + longest-commute ranking | 8 | 1.5 |
 | Mon 12/7 | Deploy to Vercel; fix bugs | 8 | 1 |
 | Tue 12/8 | Write FINAL_REPORT.md, screenshots | 8 | 1 |
 | Wed 12/9 | Demo video, submit, add repo link to class list | 8 | 0.5 |
 | | | **Total** | **~30** |
 
-If I fall behind, I'll cut in this order: the apartment-platform scraper, then commute times (I'll enter them by hand), then the KSL scraper.
+If I fall behind, I'll cut in this order: the apartment-platform scraper, then commute times (enter them by hand), then the second scraper.
 
 ## Rough UX Sketches
 
@@ -211,21 +213,21 @@ If I fall behind, I'll cut in this order: the apartment-platform scraper, then c
 
 ```
 ┌──────────────────────────────────────────────────────────────────┐
-│ ApartmentFinder    Search: Utah County, Jan 5 – Jun 30 (6 mo) ▾  │
-│ Filters: $≤1600 · 1+ bd · Orem, AF, PG, Lindon · ≤30 min         │
+│ ApartmentFinder    Search: Spring internship, Jan 5 – Jun 30 ▾  │
+│ Filters: $≤1600 · 1+ bd · 4 neighborhoods · ≤30 min              │
 │ Sort: [Total cost ▾]                     [+ Paste a listing]     │
 ├──────────────────────────────────────────────────────────────────┤
-│ The Village at Orem · 1bd/1ba · Orem              ★ Saved        │
+│ Maple Court Apartments · 1bd/1ba · Eastside       ★ Saved        │
 │ $1,350/mo  →  TOTAL $9,050 for 6 mo  + ~$720 est. utilities      │
 │   rent $8,100 · short-term +$100/mo $600 · fees $350             │
-│ 🚗 Lehi 24 min · BYU 9 min  (balanced: 24)                       │
+│ 🚗 Work 24 min · School 9 min  (longest: 24)                     │
 │ ✔ in-unit W/D, gym   ✘ no dishwasher                             │
-│ AI: + quiet, close to I-15   − older units, parking extra        │
+│ AI: + quiet, near freeway    − older units, parking extra        │
 │ [Record quote]  [Contacted]  [Reject]  [View source ↗]           │
 ├──────────────────────────────────────────────────────────────────┤
-│ Basement apt (KSL) · 2bd/1ba · Pleasant Grove                    │
+│ Basement apt (Craigslist) · 2bd/1ba · Northside                  │
 │ $1,200/mo  →  TOTAL $7,200+   ⚠ short-term price unknown, ask    │
-│ 🚗 Lehi 15 min · BYU 22 min  (balanced: 22)                      │
+│ 🚗 Work 15 min · School 22 min  (longest: 22)                    │
 └──────────────────────────────────────────────────────────────────┘
 ```
 
