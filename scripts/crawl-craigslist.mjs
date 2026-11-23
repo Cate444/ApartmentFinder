@@ -191,6 +191,8 @@ function parseListingPage(html, url) {
       available_date: parseAvailable(attrs),
       amenities: [...amenities],
       rental_type: guessRentalType(allText),
+      // Per-bedroom contracts are singles housing; everything else is left for the AI step
+      occupancy: guessRentalType(allText) ? "singles_only" : null,
       fees: labeled["application fee details"]
         ? { application_fee_details: labeled["application fee details"] }
         : {},
