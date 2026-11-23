@@ -298,7 +298,8 @@ for (const [i, r] of toFetch.entries()) {
 
     const { data, error } = await supabase
       .from("listings")
-      .upsert({ ...row, source_id: sourceId }, { onConflict: "url" })
+      // Match on the post number, not the URL: Craigslist sometimes gives the same post a new URL
+      .upsert({ ...row, source_id: sourceId }, { onConflict: "source_id,source_listing_id" })
       .select("id")
       .single();
     if (error) throw new Error(error.message);
