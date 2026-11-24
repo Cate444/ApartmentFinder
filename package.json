@@ -8,7 +8,8 @@
     "start": "next start",
     "lint": "eslint",
     "db:check": "node --env-file=.env.local scripts/check-db.mjs",
-    "crawl:craigslist": "node --env-file=.env.local scripts/crawl-craigslist.mjs"
+    "crawl:craigslist": "node --env-file=.env.local scripts/crawl-craigslist.mjs",
+    "enrich": "node --env-file=.env.local scripts/enrich-listings.mjs"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.119.0",
