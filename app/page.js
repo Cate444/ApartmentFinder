@@ -1,4 +1,5 @@
 import { Suspense } from "react";
+import Link from "next/link";
 import { connection } from "next/server";
 import { db } from "@/lib/supabase";
 import { TABLES } from "@/lib/constants";
@@ -54,6 +55,18 @@ export default function Home() {
       <p className="mt-2 opacity-70">
         Mid-term housing, ranked by the true cost of your stay.
       </p>
+      <Link
+        href="/searches/new"
+        className="mt-6 inline-block rounded-md bg-foreground px-4 py-2 font-medium text-background"
+      >
+        + New search
+      </Link>
+      <Link
+        href="/vendors"
+        className="ml-3 mt-6 inline-block rounded-md border border-black/15 px-4 py-2 font-medium dark:border-white/20"
+      >
+        Call sheet
+      </Link>
       <section className="mt-8">
         <h2 className="text-lg font-medium mb-2">Database status</h2>
         <Suspense fallback={<p>Checking database…</p>}>
